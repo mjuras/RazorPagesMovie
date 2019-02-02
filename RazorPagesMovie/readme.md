@@ -20,6 +20,8 @@ Note: it includes support for  European Union's General Data Protection Regulati
 
 RazorPagesMovie.Program.Main is the program launch point.
 
+The menu layout is implemented in the Pages/Shared/_Layout.cshtml file. Open the Pages/Shared/_Layout.cshtml file.
+
 Add a model to a Razor Pages app 
 ---
 
@@ -123,13 +125,73 @@ There is also a database found in my localDB server:
 	RazorPagesMovieContext-d2893e8a-0415-46c5-97c0-34c33fe1b403
 		tables: Movies and __EFMigrationsHistory
 
-There is one redord in the __EFMigrationsHistory
+There is one record in the __EFMigrationsHistory.  This table is used to check if the DB is in sync with the code.  When using EF Code First to automatically create a database, Code First:
+
+* Adds a table to the database to track whether the schema of the database is in sync with the model classes it was generated from.  *
+* If the model classes aren't in sync with the DB, EF throws an exception.
 
 Scaffold (generate) Razor pages
 ---
+### The CRUDL Page classes
+Razor Pages are derived from PageModel. By convention, the PageModel-derived class is called <PageName>Model. The constructor uses dependency injection to add the RazorPagesMovieContext to the page. All the scaffolded pages follow this pattern.
+
+When a request is made for the page, the OnGetAsync method returns a list of movies to the Razor Page. OnGetAsync or OnGet is called on a Razor Page to initialize the state for the page. In this case, OnGetAsync gets a list of movies and displays them.
+
+      Pages\Movies\Create.cshtml.cs(21):        public IActionResult OnGet()
+      Pages\Movies\Create.cshtml.cs(29):        public async Task<IActionResult> OnPostAsync()
+      Pages\Movies\Delete.cshtml.cs(24):        public async Task<IActionResult> OnGetAsync(int? id)
+      Pages\Movies\Delete.cshtml.cs(40):        public async Task<IActionResult> OnPostAsync(int? id)
+      Pages\Movies\Details.cshtml.cs(23):       public async Task<IActionResult> OnGetAsync(int? id)
+      Pages\Movies\Edit.cshtml.cs(25):          public async Task<IActionResult> OnGetAsync(int? id)
+      Pages\Movies\Edit.cshtml.cs(41):          public async Task<IActionResult> OnPostAsync()
+      Pages\Movies\Index.cshtml.cs(23):         public async Task OnGetAsync()
+      Pages\Error.cshtml.cs(18):                public void OnGet()
+      Pages\Index.cshtml.cs(12):                public void OnGet()
+      Pages\Privacy.cshtml.cs(12):              public void OnGet()
+
+
+When OnGet returns void or OnGetAsync returnsTask, no return method is used. When the return type is IActionResult or Task<IActionResult>, a return statement must be provided. For example, the Pages/Movies/Create.cshtml.cs OnPostAsync method:
+
+      return RedirectToPage("./Index");
+
+### The CRUDL Markup (cshtml)
+
+Examine the `Pages/Movies/Index.cshtml` Razor Page:
+
+      @page
+      @model RazorPagesMovie.Pages.Movies.IndexModel
+
+The `@page` Razor directive makes the file into an MVC action, which means that it can handle requests. @page must be the first Razor directive on a page. 
+The `@model` directive specifies the type of the model passed to the Razor Page. 
+
+The Movie property uses the [BindProperty] attribute to opt-in to model binding. When the Create form posts the form values, the ASP.NET Core runtime binds the posted values to the Movie model.
+
+      [BindProperty]
+        public Movie Movie { get; set; }
+
+
+Razor can transition from HTML into C# or into Razor-specific markup. When an @ symbol is followed by a Razor reserved keyword, it transitions into Razor-specific markup, otherwise it transitions into C#.
 
 Work with a database
 ---
+The database context is registered with the Dependency Injection container in the ConfigureServices method in Startup.cs:
+
+      public void ConfigureServices(IServiceCollection services)
+      {
+      services.Configure<CookiePolicyOptions>...
+      services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+      services.AddDbContext<RazorPagesMovieContext>(options =>
+            options.UseSqlServer(
+            Configuration.GetConnectionString("RazorPagesMovieContext")));
+      }
+
+in appsettings.json we hacve
+
+    "ConnectionStrings": {
+    "RazorPagesMovieContext": "Server=(localdb)\\mssqllocaldb;Database=RazorPagesMovieContext-d2893e8a-0415-46c5-97c0-34c33fe1b403;Trusted_Connection=True;    MultipleActiveResultSets=true"
+
+
+
 Update Razor pages
 ---
 Add search
