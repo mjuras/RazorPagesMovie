@@ -200,6 +200,20 @@ The rest of this section is about adding a helper class that uses EF conventions
 
 Update Razor pages
 ---
+
+Update the Edit, Details, and Delete Razor Pages to use the "{id:int}" route template. Change the page directive for each of these pages from 
+
+      @page  /
+      to
+      @page "{id:int?}"
+
+This allows cleaner URL for these pages for example
+
+http://localhost:5000/Movies/Details/[i] where i is an id Movie.ID value
+
+
+
+
 Add search
 ---
 Add a new field
