@@ -169,6 +169,7 @@ The Movie property uses the [BindProperty] attribute to opt-in to model binding.
       [BindProperty]
         public Movie Movie { get; set; }
 
+> Model binding in ASP.NET Core MVC maps data from HTTP requests to action method parameters. The parameters may be simple types such as strings, integers, or floats, or they may be complex types. This is a great feature of MVC because mapping incoming data to a counterpart is an often repeated scenario, regardless of size or complexity of the data. MVC solves this problem by abstracting binding away so developers don't have to keep rewriting a slightly different version of that same code in every app. Writing your own text to type converter code is tedious, and error prone.
 
 Razor can transition from HTML into C# or into Razor-specific markup. When an @ symbol is followed by a Razor reserved keyword, it transitions into Razor-specific markup, otherwise it transitions into C#.
 
@@ -201,6 +202,8 @@ The rest of this section is about adding a helper class that uses EF conventions
 Update Razor pages
 ---
 
+### @page directive modification for cleaner url 
+
 Update the Edit, Details, and Delete Razor Pages to use the "{id:int}" route template. Change the page directive for each of these pages from 
 
       @page  /
@@ -211,6 +214,7 @@ This allows cleaner URL for these pages for example
 
 http://localhost:5000/Movies/Details/[i] where i is an id Movie.ID value
 
+### concurrency exception handling
 
 
 
