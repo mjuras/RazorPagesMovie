@@ -185,14 +185,15 @@ The database context is registered with the Dependency Injection container in th
             Configuration.GetConnectionString("RazorPagesMovieContext")));
       }
 
-in appsettings.json we hacve
+in appsettings.json we have
 
     "ConnectionStrings": {
     "RazorPagesMovieContext": "Server=(localdb)\\mssqllocaldb;Database=RazorPagesMovieContext-d2893e8a-0415-46c5-97c0-34c33fe1b403;Trusted_Connection=True;    MultipleActiveResultSets=true"
 
-
 LocalDB is a lightweight version of the SQL Server Express database engine that's targeted for program development. LocalDB starts on demand and runs in user mode, so there's no complex configuration. By default, LocalDB database creates *.mdf files in the C:/Users/<user/> directory.
 > C:\Users\mark\AppData\Local\Microsoft\Microsoft SQL Server Local DB\Instances\MSSQLLocalDB
+
+The database can be viewed by selecting **From the View menu, open SQL Server Object Explorer (SSOX).**
 
 The rest of this section is about adding a helper class that uses EF conventions to load the Movie table.  
 
