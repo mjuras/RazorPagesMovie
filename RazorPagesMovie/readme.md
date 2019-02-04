@@ -206,7 +206,7 @@ Update Razor pages
 
 Update the Edit, Details, and Delete Razor Pages to use the "{id:int}" route template. Change the page directive for each of these pages from 
 
-      @page  /
+      @page
       to
       @page "{id:int?}"
 
@@ -216,10 +216,47 @@ http://localhost:5000/Movies/Details/[i] where i is an id Movie.ID value
 
 ### concurrency exception handling
 
+There is a special exception type to detect concurrency exceptions:
+
+      try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
 
 
 Add search
 ---
+In the following sections, searching movies by genre or title is added.
+
+      @page "{searchString?}"
+      ...
+      
+      public async Task OnGetAsync()
+      {
+      // Use LINQ to get list of genres.
+      IQueryable<string> genreQuery = from m in _context.Movie
+                                          orderby m.Genre
+                                          select m.Genre;
+
+      var movies = from m in _context.Movie
+                  select m;
+
+      if (!string.IsNullOrEmpty(SearchString))
+      {
+            movies = movies.Where(s => s.Title.Contains(SearchString));
+      }
+
+      if (!string.IsNullOrEmpty(MovieGenre))
+      {
+            movies = movies.Where(x => x.Genre == MovieGenre);
+      }
+      Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
+      Movie = await movies.ToListAsync();
+      }
+
+
+
 Add a new field
 ---
 Add validation
