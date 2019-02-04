@@ -227,6 +227,11 @@ There is a special exception type to detect concurrency exceptions:
 
 Add search
 ---
+There are several special attributes to allow binding form elemetns to the model:
+
+      [BindProperty(SupportsGet = true)]  public string SearchString { get; set; }
+      [BindProperty(SupportsGet = true)]  public string MovieGenre { get; set; }
+
 In the following sections, searching movies by genre or title is added.
 
       @page "{searchString?}"
@@ -255,7 +260,10 @@ In the following sections, searching movies by genre or title is added.
       Movie = await movies.ToListAsync();
       }
 
+and in the markup:
 
+      <select asp-for="MovieGenre" asp-items="Model.Genres"/> ...
+      <input type="text" asp-for="SearchString" />
 
 Add a new field
 ---
