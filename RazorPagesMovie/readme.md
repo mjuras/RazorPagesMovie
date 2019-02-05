@@ -267,6 +267,15 @@ and in the markup:
 
 Add a new field
 ---
+I add a string Rating proerty to Models\Movie.cs: public string Rating { get; set; }
+
+I have to update markup for all the pages that will display Rating -- this is somewhat repetitive, a Movie control would help. Also I do not like all of the literal strings in the markup that must tie to the code exactly.  This is fragile and not checked by the compiler and also does not have as much intellisense as I would like. 
+
+I have to add a checkpoint to the DB: dotnet ef add-migration RatingField
+I have to recreate the database witht the new schema from code: dotnet ef database update
+
+
+
 Add validation
 ---
 
