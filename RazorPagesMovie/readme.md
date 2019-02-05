@@ -280,5 +280,87 @@ Update the Movie class to take advantage of the Required, StringLength, RegularE
 
 Non-nullable value types (such as decimal, int, float, and DateTime) are inherently required and don't need the Required attribute.
 
+Publishing
+---
+I tried to create a profile and publish but it failed.  There are errors like this
+
+      C:\Program Files\dotnet\sdk\2.2.103\Sdks\Microsoft.NET.Sdk.Publish\build\netstandard1.0\PublishTargets\
+      Microsoft.NET.Sdk.Publish.FileSystem.targets(42,5): 
+      Error MSB3021: 
+      Unable to copy file      
+      "C:\projects\MVCWeb\RazorPagesMovie\RazorPagesMovie\obj\Release\netcoreapp2.2\PubTmp\Out\dotnet-aspnet-codegenerator-design.dll"
+      to
+      "http://localhost/RazorWebPages\dotnet-aspnet-codegenerator-design.dll". 
+      **The given path's format is not supported.**
+
+I had used a FileSystem Publish, but used a  url as the Target Location.  CHanging to a folder.
+      C:\projects\MVCWeb\RazorPagesMoviePublish
+
+This succeeded:
+
+      ------ Publish started: Project: RazorPagesMovie, Configuration: Release Any CPU ------
+      Connecting to C:\projects\MVCWeb\RazorPagesMoviePublish...
+      RazorPagesMovie -> C:\projects\MVCWeb\RazorPagesMovie\RazorPagesMovie\bin\Release\netcoreapp2.2\RazorPagesMovie.dll
+      RazorPagesMovie -> C:\projects\MVCWeb\RazorPagesMovie\RazorPagesMovie\bin\Release\netcoreapp2.2\RazorPagesMovie.Views.dll
+      RazorPagesMovie -> C:\projects\MVCWeb\RazorPagesMovie\RazorPagesMovie\obj\Release\netcoreapp2.2\PubTmp\Out\
+      Web App was published successfully file:///C:/projects/MVCWeb/RazorPagesMoviePublish
+
+I ended up having to add a site in IIS
+      port = 5000
+      content path = C:/projects/MVCWeb/RazorPagesMoviePublish
+      App Pool = No Managed code
+
+I can how browser to localhost:5000 and see the site however I cannot query the DB.
+
+First I had an issue that the site was raising exceptions and it did not want to display those in production.  In order to see teh exceptions in prod, I changed to web.config to say I was in Development.
+
+      <aspNetCore processPath="dotnet" arguments=".\RazorPagesMovie.dll" stdoutLogEnabled="false" stdoutLogFile=".\logs\stdout" hostingModel="InProcess" >
+        <environmentVariables>
+            <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Development" />
+         </environmentVariables>
+
+Then I find the exception is regarding connecting to LocalDB from IIS.  
+
+> SqlException: A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections
+
+> Event log: Cannot get a local application data path. Most probably a user profile is not loaded. If LocalDB is executed under IIS, make sure that profile loading is enabled for the current user.
+
+LocalDB as I set it up is a profile-specific resource and it cannot be accessed from IIS be default.  It is possible to allow this web app to access IIS.
+
+> As described in KB 2547655 enabling loadUserProfile is not enough to fully load user profile, we also need to enable setProfileEnvironment. This requires editing applicationHost.config file which is usually located in C:\Windows\System32\inetsrv\config. Following the instructions from KB 2547655 we should enable both flags for Application Pool ASP.NET v4.0.
+
+      <add name="DotNetMVC" autoStart="true" managedRuntimeVersion="">
+                <processModel identityType="ApplicationPoolIdentity" loadUserProfile="true" setProfileEnvironment="true"/>
+      </add>
+
+The site now runs using IIS and LocalDB.
+
+However, it is not using the dev DB under the mark Profile.  Rather, it has created a new profile 
+C:\Users\DotNetMVC with its own LocalDB.  
+
+I find my profiles folder is a bit of a junkyard of old projects as it appears Windows/IIS/.NET have been happily setting these up over the years:
+
+      C:\Users\
+      03/04/2015  11:21 PM    <DIR>          TEMP
+      03/04/2015  11:21 PM    <DIR>          TEMP.IIS APPPOOL
+      04/15/2015  09:09 PM    <DIR>          AspTest
+      04/15/2015  09:09 PM    <DIR>          testing
+      09/07/2015  04:11 PM    <DIR>          Classic .NET AppPool
+      05/27/2016  10:37 AM    <DIR>          gmWebSite
+      05/28/2016  10:38 AM    <DIR>          dev0.gmi.local
+      07/17/2016  02:10 PM    <DIR>          ASPClassicPool
+      08/23/2016  02:14 PM    <DIR>          Public
+      11/19/2016  09:24 AM    <DIR>          gmSpecASP
+      01/02/2017  06:53 PM    <DIR>          dev.greatmigrations.com
+      01/02/2017  07:55 PM    <DIR>          ASP.NET v4.0
+      01/03/2017  12:47 PM    <DIR>          FMStocks
+      03/03/2017  12:27 PM    <DIR>          iis.greatmigrations.com
+      05/05/2017  11:44 AM    <DIR>          www.greatmigrations.com
+      07/11/2017  09:48 AM    <DIR>          info.greatmigrations.com
+      07/11/2017  11:35 AM    <DIR>          test.greatmigrations.com
+      10/25/2017  01:24 PM    <DIR>          info
+      02/05/2019  08:25 AM    <DIR>          DefaultAppPool
+      02/05/2019  09:12 AM    <DIR>          DotNetMVC
+      02/05/2019  09:21 AM    <DIR>          mark
 
 [More on markdown](https://www.markdownguide.org/basic-syntax/)
