@@ -274,10 +274,11 @@ I have to update markup for all the pages that will display Rating -- this is so
 I have to add a checkpoint to the DB: dotnet ef add-migration RatingField
 I have to recreate the database witht the new schema from code: dotnet ef database update
 
-
-
 Add validation
 ---
+Update the Movie class to take advantage of the Required, StringLength, RegularExpression, and Range validation attributes.
+
+Non-nullable value types (such as decimal, int, float, and DateTime) are inherently required and don't need the Required attribute.
 
 
 [More on markdown](https://www.markdownguide.org/basic-syntax/)
